@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using JBPTicketsApp.Models;
 using JBPTicketsApp.Models.Entities;
+using JBPTicketsApp.Models.ViewModels;
 
 namespace JBPTicketsApp.Controllers
 {
@@ -57,7 +58,7 @@ namespace JBPTicketsApp.Controllers
         // POST: Personas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        /*[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdPersona,Nombre,IdRed,IdNivelLiderazgo")] Persona persona)
         {
@@ -70,6 +71,31 @@ namespace JBPTicketsApp.Controllers
             ViewData["IdNivelLiderazgo"] = new SelectList(_context.NivelesLiderazgo, "IdNivelLiderazgo", "Nombre", persona.IdNivelLiderazgo);
             ViewData["IdRed"] = new SelectList(_context.Redes, "IdRed", "Nombre", persona.IdRed);
             return View(persona);
+        }*/
+
+        [HttpPost]
+        public IActionResult Create(RegistrarPersonaViewModel model, Persona persona)
+        {
+            try
+            {
+                foreach (var oP in model.Persona)
+                {
+                    Persona oPersona = new Persona();
+                    oPersona.Nombre = oP.Nombre;
+                    oPersona.IdRed = oP.IdRed;
+                    oPersona.IdNivelLiderazgo = oP.IdTitulo;
+                    _context.Personas.Add(oPersona);
+                }
+
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }catch (Exception ex)
+            {
+                ViewBag.message = "No se pudieron crear los registros";
+                ViewData["IdNivelLiderazgo"] = new SelectList(_context.NivelesLiderazgo, "IdNivelLiderazgo", "Nombre", persona.IdNivelLiderazgo);
+                ViewData["IdRed"] = new SelectList(_context.Redes, "IdRed", "Nombre", persona.IdRed);
+                return View(model);
+            }
         }
 
         // GET: Personas/Edit/5
