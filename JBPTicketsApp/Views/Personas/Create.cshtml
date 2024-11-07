@@ -1,0 +1,88 @@
+﻿@model JBPTicketsApp.Models.Entities.Persona
+
+@{
+    ViewData["Title"] = "Agregar Discípulo";
+    int i = 1;
+}
+
+<form asp-action="Create" class="card shadow-lg">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="card-body row align-items-end">
+        <div class="col-md-3 mb-3">
+            Nombre:
+            <input asp-for="Nombre" class="form-control" id="nombre" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+        <div class="col-md-3 mb-3">
+            Red:
+            <select asp-for="IdRed" class="form-control" asp-items="ViewBag.IdRed" id="red">
+                <option selected disabled>Seleccione una red</option>
+            </select>
+        </div>
+        <div class="col-md-3 mb-3">
+            Título:
+            <select asp-for="IdNivelLiderazgo" class="form-control" asp-items="ViewBag.IdNivelLiderazgo" id="titulo">
+                <option selected disabled>Seleccione el nivel de liderazgo</option>
+            </select>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button type="button" id="btn-lista" class="btn btn-success">Agregar</button>
+        </div>
+    </div>
+
+    <table class="table table-hover table-striped table-primary">
+        <thead>
+            <tr>
+                <td>#</td>
+                <td>Nombre</td>
+                <td>Red</td>
+                <td>Nivel de Liderazgo</td>
+            </tr>
+        </thead>
+        <tbody class="tbody">
+
+        </tbody>
+    </table>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+
+<script>
+    const btnListarPersona = document.getElementById("btn-lista")
+    let i = 1
+    btnListarPersona.addEventListener('click', () =>{
+        let nombreEl = document.getElementById("nombre").value
+        let redEl = document.getElementById("red").value
+        let tituloEl = document.getElementById("titulo").value
+
+        let tBodyEl = document.querySelector('.tbody')
+        let trEl = document.createElement("tr")
+        let tdNumero = document.createElement("td")
+        let tdNombre = document.createElement("td")
+        let tdRed = document.createElement("td")
+        let tdTitulo = document.createElement("td")
+
+        trEl.appendChild(tdNumero)
+        trEl.appendChild(tdNombre)
+        trEl.appendChild(tdRed)
+        trEl.appendChild(tdTitulo)
+        tBodyEl.appendChild(trEl)
+
+        tdNumero.innerHTML = i
+        tdNombre.innerHTML = nombreEl
+        tdRed.innerHTML = redEl
+        tdTitulo.innerHTML = tituloEl
+
+        console.log(nombreEl)
+        console.log(redEl)
+        console.log(tituloEl)
+
+        document.getElementById("nombre").value = ""
+        document.getElementById("red").value = ""
+        document.getElementById("titulo").value = ""
+        i++
+    })
+</script>

@@ -1,0 +1,35 @@
+﻿@model IEnumerable<JBPTicketsApp.Models.Entities.Red>
+
+@{
+    ViewData["Title"] = "Listado de redes";
+}
+
+<a class="btn btn-primary" asp-action="Create">Agregar</a>
+
+<table class="table table-bordered table-success table-hover my-3" width="100%">
+    <thead class="bg-opacity-25 bg-success">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Nombre)
+            </th>
+            <th>
+                Acciones
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nombre)
+                </td>
+                <td>
+                    <a class="btn btn-success" asp-action="Edit" asp-route-id="@item.IdRed">Editar</a> |
+                    <a class="btn btn-secondary" asp-action="Details" asp-route-id="@item.IdRed">Detalles</a> |
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.IdRed">Eliminar</a> |
+                    <a class="btn btn-info">Agregar discípulo</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
