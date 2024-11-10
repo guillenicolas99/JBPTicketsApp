@@ -1,0 +1,46 @@
+﻿@model JBPTicketsApp.Models.Entities.Evento
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<section class="my-3">
+    <ul class="list-group" style="width: 50%">
+        <li class="list-group-item">
+            <strong>@Html.DisplayNameFor(model => model.Nombre):</strong>
+            @Html.DisplayFor(model => model.Nombre)
+        </li>
+        <li class="list-group-item">
+            <strong>@Html.DisplayNameFor(model => model.Fecha):</strong>
+            @Html.DisplayFor(model => model.Fecha)
+        </li>
+    </ul>
+
+    <table class="table table-hover table-striped shadow border myTable" id="availableTickets">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Precio</th>
+                <th>Estado</th>
+                <th>Categoría</th>
+                <th>Responsable</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in Model.Tickets)
+            {
+                <tr data-ticket-id="@ticket.IdTicket" class="available-ticket">
+                    <td>@ticket.Codigo</td>
+                    <td>$@ticket.Precio</td>
+                    <td>@ticket.Estado</td>
+                    <td>@ticket.Categoria?.Nombre</td>
+                    <td class="ticket-asignado">@ticket.Persona?.Nombre</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>
+<div>
+    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.IdEvento">Editar este evento</a> |
+    <a class="btn btn-outline-secondary" asp-action="Index">Volver a la lista de eventos</a>
+</div>

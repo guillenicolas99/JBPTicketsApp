@@ -1,0 +1,43 @@
+﻿@model IEnumerable<JBPTicketsApp.Models.Entities.Evento>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<a class="my-3 btn btn-primary" asp-action="Create">
+    Agregar Evento
+</a>
+
+<table class="table table-secondary table-striped shadow table-hover myTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Nombre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fecha)
+            </th>
+            <th>
+                Acciones
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nombre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fecha)
+            </td>
+            <td>
+                <a class="btn btn-outline-info" asp-action="AsignarTickets" asp-route-id="@item.IdEvento">Asignar</a> |
+                <a class="btn btn-outline-success" asp-action="Edit" asp-route-id="@item.IdEvento">Edit</a> |
+                <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@item.IdEvento">Details</a> |
+                <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@item.IdEvento">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

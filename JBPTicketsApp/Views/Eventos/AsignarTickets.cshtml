@@ -1,0 +1,207 @@
+﻿@model JBPTicketsApp.Models.Entities.Evento
+
+@{
+    ViewData["Title"] = "Asignar tickets";
+}
+
+<div class="card shadow my-3">
+    <div class="card-body">
+        <h2>Detalles del Evento</h2>
+        <p><strong>Nombre del evento:</strong> @Model.Nombre</p>
+        <p><strong>Fecha del evento:</strong> @Model.Fecha.ToShortDateString()</p>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Agregar Tickets
+        </button>
+    </div>
+</div>
+
+<!-- MODAL PARA AGREGAR TICKETS POR JS -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Tickets</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="py-3">
+    <div class="row">
+        <!-- Columna de tickets disponibles -->
+        <div class="col-md-6">
+            <h4>Tickets disponibles</h4>
+            <table class="table table-hover table-striped shadow border myTable" id="availableTickets">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                        <th>Categoría</th>
+                        <th>Responsable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ticket in Model.Tickets)
+                    {
+                        <tr data-ticket-id="@ticket.IdTicket" class="available-ticket">
+                            <td>@ticket.Codigo</td>
+                            <td>$@ticket.Precio</td>
+                            <td>@ticket.Estado</td>
+                            <td>@ticket.Categoria?.Nombre</td>
+                            <td class="ticket-asignado">@ticket.Persona?.Nombre</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Columna de tickets asignados -->
+        <div class="col-md-6">
+            <h4>Tickets asignados</h4>
+            <select class="form-select" asp-items="ViewBag.idPersona" id="persona">
+                <option selected disabled value="">Seleccione una Persona</option>
+            </select>
+
+
+            <table class="table table-hover table-striped shadow border my-3" id="assignedTickets">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                        <th>Categoría</th>
+                        <th>Antes</th>
+                        <th>Asignado a</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se agregarán dinámicamente las tickets asignadas -->
+                </tbody>
+            </table>
+            <!-- Botón para guardar asignaciones -->
+            <button class="btn btn-success disabled submitAssignments mt-3" onclick="submitAssignments()">Guardar Asignaciones</button>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts {
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const assignments = {}; // Objeto para almacenar las asignaciones
+            const sinAsignar = "Sin asignar";
+
+            // Función para asignar ticket a la persona seleccionada
+            function assignTicket(ticket) {
+                const personaSelect = document.getElementById("persona");
+                const personaId = personaSelect.value;
+                const personaName = personaSelect.options[personaSelect.selectedIndex].text;
+                const ticketAsignado = ticket.querySelector('.ticket-asignado');
+
+                if (!personaId) {
+                    alert("Seleccione una persona para asignar la ticket.");
+                    return;
+                }
+
+                if (ticketAsignado && ticketAsignado.textContent !== sinAsignar) {
+                    alert("Esta ticket ya está asignada");
+                    return;
+                }
+
+                const ticketId = ticket.dataset.ticketId;
+                const ticketRow = ticket.cloneNode(true);
+
+                // Añadimos columna con el nombre de la persona y botón de desasignación
+                const personaColumn = document.createElement("td");
+                personaColumn.textContent = personaName;
+                ticketRow.appendChild(personaColumn);
+
+                const unassignButton = document.createElement("button");
+                unassignButton.textContent = "X";
+                unassignButton.classList.add("btn", "btn-outline-danger", "btn-sm", "ms-2");
+                unassignButton.addEventListener("click", function () {
+                    unassignTicket(ticketRow, ticketId);
+                });
+                personaColumn.appendChild(unassignButton);
+
+                // Mueve la ticket a la tabla de asignados
+                document.querySelector('#assignedTickets tbody').appendChild(ticketRow);
+                ticket.remove();
+
+                // Habilita el botón de enviar asignaciones
+                document.querySelector('.submitAssignments').classList.remove('disabled');
+
+                // Guarda la asignación en el objeto assignments
+                assignments[ticketId] = personaId;
+            }
+
+            // Función para desasignar una ticket y devolverla a la lista de disponibles
+            function unassignTicket(ticketRow, ticketId) {
+                const availableTicketsTable = document.querySelector("#availableTickets tbody");
+
+                // Remueve la asignación del objeto assignments
+                delete assignments[ticketId];
+
+                // Devuelve la ticket a la lista de disponibles
+                const originalTicketRow = ticketRow.cloneNode(true);
+                originalTicketRow.querySelector("td:last-child").remove(); // Remover la columna de persona asignada
+
+                originalTicketRow.addEventListener("click", function () {
+                    assignTicket(originalTicketRow);
+                });
+
+                availableTicketsTable.appendChild(originalTicketRow);
+                ticketRow.remove();
+
+                // Desactiva el botón de enviar si no quedan tickets asignados
+                if (Object.keys(assignments).length === 0) {
+                    document.querySelector('.submitAssignments').classList.add('disabled');
+                }
+            }
+
+            // Delegación de eventos para los tickets disponibles
+            document.querySelector("#availableTickets tbody").addEventListener("click", function (event) {
+                const clickedTicket = event.target.closest(".available-ticket");
+                if (clickedTicket) {
+                    assignTicket(clickedTicket);
+                }
+            });
+
+            // Función para guardar asignaciones en un formulario oculto y enviarlas
+            document.querySelector(".submitAssignments").addEventListener("click", function () {
+                const form = document.createElement("form");
+                form.method = "POST";
+                form.action = "/Eventos/AsignarTickets"; // Cambia al endpoint adecuado en tu controlador
+
+                for (const ticketId in assignments) {
+                    const personaId = assignments[ticketId];
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = `TicketsAsignados[${ticketId}]`;
+                    input.value = personaId;
+                    form.appendChild(input);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            });
+        });
+    </script>
+}
+
+<style>
+    .available-ticket:hover{
+        cursor:pointer;
+    }
+</style>

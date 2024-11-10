@@ -54,21 +54,26 @@ namespace JBPTicketsApp.Models
                 );
 
             modelBuilder.Entity<Red>().HasData(
-                new Red { IdRed = 1, Nombre = "Adonai" },
-                new Red { IdRed = 2, Nombre = "El Elyon" },
-                new Red { IdRed = 3, Nombre = "El Shaddai" },
-                new Red { IdRed = 4, Nombre = "Emmanuel" },
-                new Red { IdRed = 5, Nombre = "YAWHE" }
+                new Red { IdRed = 1, Nombre = "Sin red" },
+                new Red { IdRed = 2, Nombre = "Adonai" },
+                new Red { IdRed = 3, Nombre = "El Elyon" },
+                new Red { IdRed = 4, Nombre = "El Shaddai" },
+                new Red { IdRed = 5, Nombre = "Emmanuel" },
+                new Red { IdRed = 6, Nombre = "YAWHE" }
                 );
 
+            modelBuilder.Entity<Persona>().HasData(
+                new Persona { IdPersona = 1, Nombre = "Sin asignar", IdRed = 1, IdNivelLiderazgo = 1 }
+                );
             modelBuilder.Entity<NivelLiderazgo>().HasData(
-                new NivelLiderazgo { IdNivelLiderazgo = 1, Nombre = "Miembro" },
-                new NivelLiderazgo { IdNivelLiderazgo = 2, Nombre = "Discipulo" },
-                new NivelLiderazgo { IdNivelLiderazgo = 3, Nombre = "Líder de Casa de Paz" },
-                new NivelLiderazgo { IdNivelLiderazgo = 4, Nombre = "Líder de Discípulo" },
-                new NivelLiderazgo { IdNivelLiderazgo = 5, Nombre = "Diácono" },
-                new NivelLiderazgo { IdNivelLiderazgo = 6, Nombre = "Anciano" },
-                new NivelLiderazgo { IdNivelLiderazgo = 7, Nombre = "Efesio" }
+                new NivelLiderazgo { IdNivelLiderazgo = 1, Nombre = "Sin Nivel" },
+                new NivelLiderazgo { IdNivelLiderazgo = 2, Nombre = "Miembro" },
+                new NivelLiderazgo { IdNivelLiderazgo = 3, Nombre = "Discipulo" },
+                new NivelLiderazgo { IdNivelLiderazgo = 4, Nombre = "Líder de Casa de Paz" },
+                new NivelLiderazgo { IdNivelLiderazgo = 5, Nombre = "Líder de Discípulo" },
+                new NivelLiderazgo { IdNivelLiderazgo = 6, Nombre = "Diácono" },
+                new NivelLiderazgo { IdNivelLiderazgo = 7, Nombre = "Anciano" },
+                new NivelLiderazgo { IdNivelLiderazgo = 8, Nombre = "Efesio" }
                 );
         }
     }

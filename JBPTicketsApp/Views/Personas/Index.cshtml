@@ -4,12 +4,9 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<a class="btn btn-primary" asp-action="Create">Create New</a>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<table class="table table-light table-hover table-striped shadow-lg my-3 myTable">
     <thead>
         <tr>
             <th>
@@ -21,7 +18,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.NivelLiderazgo)
             </th>
-            <th></th>
+            <th>
+                Acciones
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -37,9 +36,9 @@
                 @Html.DisplayFor(modelItem => item.NivelLiderazgo.Nombre)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.IdPersona">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdPersona">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdPersona">Delete</a>
+                <a class="btn btn-outline-success" asp-action="Edit" asp-route-id="@item.IdPersona">Edit</a> |
+                <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@item.IdPersona">Details</a> |
+                <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@item.IdPersona">Delete</a>
             </td>
         </tr>
 }

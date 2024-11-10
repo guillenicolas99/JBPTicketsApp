@@ -13,13 +13,13 @@
         </div>
         <div class="col-md-3 mb-3">
             Red:
-            <select class="form-control" asp-items="ViewBag.IdRed" id="red" >
+            <select class="form-select" asp-items="ViewBag.IdRed" id="red" >
                 <option selected disabled value="">Seleccione una red</option>
             </select>
         </div>
         <div class="col-md-3 mb-3">
             Título:
-            <select class="form-control" asp-items="ViewBag.IdNivelLiderazgo" id="titulo">
+            <select class="form-select" asp-items="ViewBag.IdNivelLiderazgo" id="titulo">
                 <option selected disabled value="">Seleccione el nivel de liderazgo</option>
             </select>
         </div>
@@ -36,19 +36,19 @@
         }
     </div>
 
-    <table class="table table-hover table-striped table-primary">
-        <thead>
-            <tr>
-                <td>#</td>
-                <td>Nombre</td>
-                <td>Red</td>
-                <td>Nivel de Liderazgo</td>
-            </tr>
-        </thead>
-        <tbody class="tbody">
-
-        </tbody>
-    </table>
+    <div class="card-body">
+        <table class="table table-hover table-striped table-light">
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <td>Nombre</td>
+                    <td>Red</td>
+                    <td>Nivel de Liderazgo</td>
+                </tr>
+            </thead>
+            <tbody class="tbody"></tbody>
+        </table>
+    </div>
     <button class="btn btn-success btn-submit" type="submit">Guardar</button>
 </form>
 
@@ -56,79 +56,70 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
 
-
 <script>
-    const btnListarPersona = document.getElementById("btn-lista")
-    let i = 1
-    let num = 0
-    const btnSubmit = document.querySelector('.btn-submit')
-    btnSubmit.classList.add('disabled')
+    const btnListarPersona = document.getElementById("btn-lista");
+    const btnSubmit = document.querySelector('.btn-submit');
+    const tBodyEl = document.querySelector('.tbody');
+    const errMessage = document.querySelector('.error-message');
+    let num = 0;
 
-    btnListarPersona.addEventListener('click', () =>{
-        let nombreEl = document.getElementById("nombre")
-        let redEl = document.getElementById("red")
-        let tituloEl = document.getElementById("titulo")
-        const cardBody = document.querySelector('.card-body')
-        const errMessage = document.querySelector('.error-message')
+    btnSubmit.classList.add('disabled');
 
-        if (nombreEl.value == "" || redEl.value == "" || tituloEl.value == "") {
-            errMessage.classList.remove('d-none')
-            return
+    function clearForm() {
+        document.getElementById("nombre").value = "";
+        document.getElementById("red").value = "";
+        document.getElementById("titulo").value = "";
+    }
+
+    function createHiddenInput(name, value) {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = "hidden";
+        hiddenInput.name = name;
+        hiddenInput.value = value;
+        return hiddenInput;
+    }
+
+    function addPersonaRow(index, nombre, redText, tituloText) {
+        const row = `
+                <tr>
+                    <td>${index}</td>
+                    <td>${nombre}</td>
+                    <td>${redText}</td>
+                    <td>${tituloText}</td>
+                </tr>
+            `;
+        tBodyEl.insertAdjacentHTML('beforeend', row);
+    }
+
+    function addHiddenFields(num, nombre, titulo, red) {
+        const hiddenFields = [
+            createHiddenInput("Persona.index", num),
+            createHiddenInput(`Persona[${num}].Nombre`, nombre),
+            createHiddenInput(`Persona[${num}].IdTitulo`, titulo),
+            createHiddenInput(`Persona[${num}].IdRed`, red)
+        ];
+
+        hiddenFields.forEach(field => tBodyEl.appendChild(field));
+    }
+
+    btnListarPersona.addEventListener('click', () => {
+        const nombreEl = document.getElementById("nombre");
+        const redEl = document.getElementById("red");
+        const tituloEl = document.getElementById("titulo");
+
+        if (!nombreEl.value || !redEl.value || !tituloEl.value) {
+            errMessage.classList.remove('d-none');
+            return;
         }
-        errMessage.classList.add('d-none')
+        errMessage.classList.add('d-none');
 
-        let tBodyEl = document.querySelector('.tbody')
-        let trEl = document.createElement("tr")
-        let tdNumero = document.createElement("td")
-        let tdNombre = document.createElement("td")
-        let tdRed = document.createElement("td")
-        let tdTitulo = document.createElement("td")
+        addPersonaRow(num + 1, nombreEl.value, redEl.options[redEl.selectedIndex].text, tituloEl.options[tituloEl.selectedIndex].text);
+        addHiddenFields(num, nombreEl.value, tituloEl.value, redEl.value);
 
-        trEl.appendChild(tdNumero)
-        trEl.appendChild(tdNombre)
-        trEl.appendChild(tdRed)
-        trEl.appendChild(tdTitulo)
-        tBodyEl.appendChild(trEl)
-
-        tdNumero.innerHTML = i
-        tdNombre.innerHTML = nombreEl.value
-        tdRed.innerHTML = redEl.options[redEl.selectedIndex].text
-        tdTitulo.innerHTML = tituloEl.options[tituloEl.selectedIndex].text
-
-        //AGREGAMOS HIDDENS
-        let hiddenIndex = document.createElement('input')
-        let hiddenNombre = document.createElement('input')
-        let hiddenTitulo = document.createElement('input')
-        let hiddenRed = document.createElement('input')
-
-        hiddenIndex.name = "Persona.index"
-        hiddenIndex.value = num
-        hiddenIndex.type = "hidden"
-
-        hiddenNombre.name = `Persona[${num}].Nombre`
-        hiddenNombre.value = nombreEl.value
-        hiddenNombre.type = "hidden"
-
-        hiddenTitulo.name = `Persona[${num}].IdTitulo`
-        hiddenTitulo.value = tituloEl.value
-        hiddenTitulo.type = "hidden"
-
-        hiddenRed.name = `Persona[${num}].IdRed`
-        hiddenRed.value = redEl.value
-        hiddenRed.type = "hidden"
-
-        tBodyEl.appendChild(hiddenIndex)
-        tBodyEl.appendChild(hiddenNombre)
-        tBodyEl.appendChild(hiddenRed)
-        tBodyEl.appendChild(hiddenTitulo)
-
-        document.getElementById("nombre").value = ""
-        document.getElementById("red").value = ""
-        document.getElementById("titulo").value = ""
-        i++
-        num++
+        clearForm();
+        num++;
         if (num > 0) {
-            btnSubmit.classList.remove('disabled')
+            btnSubmit.classList.remove('disabled');
         }
-    })
+    });
 </script>

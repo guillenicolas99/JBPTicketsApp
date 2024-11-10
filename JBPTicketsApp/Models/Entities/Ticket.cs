@@ -31,8 +31,8 @@ namespace JBPTicketsApp.Models.Entities
         public virtual Categoria Categoria { get; set; }
 
         [ForeignKey("Persona")]
-        public int IdPersona { get; set; }
-        public virtual Persona Persona { get; set; }
+        public int? IdPersona { get; set; }
+        public virtual Persona? Persona { get; set; }
     }
 
 }
