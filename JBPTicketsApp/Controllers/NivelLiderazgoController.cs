@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using JBPTicketsApp.Models;
 using JBPTicketsApp.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JBPTicketsApp.Controllers
 {
+    [Authorize]
     public class NivelLiderazgoController : Controller
     {
         private readonly AppDbContext _context;

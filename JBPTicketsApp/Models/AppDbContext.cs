@@ -15,6 +15,7 @@ namespace JBPTicketsApp.Models
         public DbSet<Persona> Personas { get; set; }
         public DbSet<Red> Redes { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

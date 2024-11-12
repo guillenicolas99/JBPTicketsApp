@@ -1,4 +1,8 @@
 using JBPTicketsApp.Models;
+using JBPTicketsApp.Servicios.Contrato;
+using JBPTicketsApp.Servicios.Implementacion;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,8 +13,28 @@ builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString)
 );
 
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Inicio/IniciarSesion";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+    })
+    ;
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddControllersWithViews(op =>
+{
+    op.Filters.Add(
+        new ResponseCacheAttribute
+        {
+            NoStore = true,
+            Location = ResponseCacheLocation.None,
+        }
+    );
+});
 
 var app = builder.Build();
 
@@ -27,10 +51,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+
+
+//AUTENTIFICACIÓN DEL USUARIO
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Inicio}/{action=IniciarSesion}/{id?}");
 
 app.Run();

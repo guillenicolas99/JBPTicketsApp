@@ -1,0 +1,52 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Iniciar Sesion</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+</head>
+<body>
+
+    <main class="d-flex justify-content-center align-items-center" style="width: 100vw; height: 100vh;">
+        <div class="container">
+            <div class="card mx-auto" style="max-width:456px">
+                <div class="card-header">
+                    <h2 class="card-title">Iniciar Sesión</h2>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="IniciarSesion" asp-controller"Inicio" method="post">
+                        <div class="mb-3">
+                            <input type="email" placeholder="Ingrese el correo" class="form-control" required name="correo" />
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" placeholder="Ingrese la contraseña" class="form-control" required name="clave" />
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-primary" type="submit">Iniciar Sesión</button>
+                        </div>
+                        @if (ViewData["Mensaje"] != null)
+                        {
+                            <div class="alert alert-danger my-3" role="alert">
+                                <strong>@ViewData["Mensaje"]</strong>
+                            </div>
+                        }
+
+                        <strong>¿No tienes una cuenta?</strong>
+                        <a asp-action="Registrarse" asp-controller="Inicio">¡Registrarse!</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

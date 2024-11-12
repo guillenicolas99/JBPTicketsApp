@@ -99,6 +99,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+
             const assignments = {}; // Objeto para almacenar las asignaciones
             const sinAsignar = "Sin asignar";
 
@@ -178,11 +179,14 @@
                 }
             });
 
+
             // Función para guardar asignaciones en un formulario oculto y enviarlas
             document.querySelector(".submitAssignments").addEventListener("click", function () {
+                const asignarTicketsUrl = '@Url.Action("AsignarTickets", "Eventos")';
+
                 const form = document.createElement("form");
                 form.method = "POST";
-                form.action = "/Eventos/AsignarTickets"; // Cambia al endpoint adecuado en tu controlador
+                form.action = asignarTicketsUrl; // Cambia al endpoint adecuado en tu controlador
 
                 for (const ticketId in assignments) {
                     const personaId = assignments[ticketId];

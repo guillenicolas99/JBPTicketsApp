@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using JBPTicketsApp.Models;
 using JBPTicketsApp.Models.Entities;
 using JBPTicketsApp.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JBPTicketsApp.Controllers
 {
+    [Authorize]
     public class TicketsController : Controller
     {
         private readonly AppDbContext _context;
