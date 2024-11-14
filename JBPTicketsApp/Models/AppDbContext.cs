@@ -1,4 +1,5 @@
 ﻿using JBPTicketsApp.Models.Entities;
+using JBPTicketsApp.Recursos;
 using Microsoft.EntityFrameworkCore;
 
 namespace JBPTicketsApp.Models
@@ -16,6 +17,8 @@ namespace JBPTicketsApp.Models
         public DbSet<Red> Redes { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Rol> Roles { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +50,23 @@ namespace JBPTicketsApp.Models
                 .WithOne(p => p.NivelLiderazgo)
                 .HasForeignKey(p => p.IdNivelLiderazgo);
 
+            modelBuilder.Entity<Usuario>()
+            .HasOne(u => u.Rol)
+            .WithMany(r => r.Usuarios)
+            .HasForeignKey(u => u.IdRol);
+
+
+            modelBuilder.Entity<Rol>().HasData(
+                new Rol { IdRol = 1, NombreRol = "Admin"},
+                new Rol { IdRol = 2, NombreRol = "User"},
+                new Rol { IdRol = 3, NombreRol = "Manager"}
+            );
+
+            modelBuilder.Entity<Usuario>().HasData(
+                new Usuario { IdUsuario = 1, NombreUsuario = "Admin", Correo = "admin@gmail.com" ,Clave = Utilidades.EncriptarClave("Admin123"), IdRol = 1},
+                new Usuario { IdUsuario = 2, NombreUsuario = "User", Correo = "user@gmail.com", Clave = Utilidades.EncriptarClave("User123"), IdRol = 2},
+                new Usuario { IdUsuario = 3, NombreUsuario = "Manager", Correo = "manager@gmail.com", Clave = Utilidades.EncriptarClave("Admin123"), IdRol = 3}
+            );
 
             modelBuilder.Entity<Categoria>().HasData(
                 new Categoria { IdCategoria = 1, Nombre = "Premium"},

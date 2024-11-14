@@ -4,6 +4,7 @@ using JBPTicketsApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JBPTicketsApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241112165416_AddRoles")]
+    partial class AddRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -335,7 +338,7 @@ namespace JBPTicketsApp.Migrations
                         new
                         {
                             IdUsuario = 1,
-                            Clave = "3b612c75a7b5048a435fb6ec81e52ff92d6d795a8b5a9c17070f6a63c97a53b2",
+                            Clave = "Admin123",
                             Correo = "admin@gmail.com",
                             IdRol = 1,
                             NombreUsuario = "Admin"
@@ -343,7 +346,7 @@ namespace JBPTicketsApp.Migrations
                         new
                         {
                             IdUsuario = 2,
-                            Clave = "a61a8adf60038792a2cb88e670b20540a9d6c2ca204ab754fc768950e79e7d36",
+                            Clave = "User123",
                             Correo = "user@gmail.com",
                             IdRol = 2,
                             NombreUsuario = "User"
@@ -351,7 +354,7 @@ namespace JBPTicketsApp.Migrations
                         new
                         {
                             IdUsuario = 3,
-                            Clave = "3b612c75a7b5048a435fb6ec81e52ff92d6d795a8b5a9c17070f6a63c97a53b2",
+                            Clave = "Manager123",
                             Correo = "manager@gmail.com",
                             IdRol = 3,
                             NombreUsuario = "Manager"

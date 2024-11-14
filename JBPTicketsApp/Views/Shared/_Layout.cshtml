@@ -23,9 +23,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Register" asp-action="Registrarse">Agregar Usuario</a>
+                            </li>
+                        }
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Agregar
@@ -35,8 +38,8 @@
                                 <li><a class="dropdown-item" asp-action="Create" asp-controller="Personas">Agregar personas</a></li>
                             </ul>
                         </li>
-
                     </ul>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Inicio" asp-action="CerrarSesion">Cerrar Sesión</a>
                 </div>
             </div>
         </nav>

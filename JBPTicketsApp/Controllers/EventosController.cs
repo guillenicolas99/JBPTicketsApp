@@ -63,7 +63,7 @@ namespace JBPTicketsApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdEvento,Nombre,Fecha")] Evento evento, int totalTickets, int categoria, double precio)
+        public async Task<IActionResult> Create([Bind("IdEvento,Nombre,Fecha")] Evento evento, int totalPremium, int precioPremium, int totalVip, int precioVip, int totalGeneral, int precioGeneral)
         {
             if (ModelState.IsValid)
             {
@@ -71,7 +71,9 @@ namespace JBPTicketsApp.Controllers
                 await _context.SaveChangesAsync();
                 var idEvento = evento.IdEvento;
 
-                CrearTickets(idEvento, totalTickets, categoria, precio);
+                CrearTickets(idEvento, totalPremium, 1, precioPremium);
+                CrearTickets(idEvento, totalVip, 2, precioVip);
+                CrearTickets(idEvento, totalGeneral, 3, precioGeneral);
                 
                 return RedirectToAction(nameof(Index));
             }

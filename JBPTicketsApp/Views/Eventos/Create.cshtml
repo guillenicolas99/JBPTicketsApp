@@ -4,38 +4,67 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Evento</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form asp-action="Create" class="card shadow">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
+            <div class="card-header">
+                <h2 class="card-title">Información del evento</h2>
             </div>
-            <div class="form-group">
-                <label asp-for="Fecha" class="control-label"></label>
-                <input asp-for="Fecha" class="form-control" />
-                <span asp-validation-for="Fecha" class="text-danger"></span>
-            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="Nombre" class="control-label">Nombre del evento</label>
+                    <input asp-for="Nombre" class="form-control" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Fecha" class="control-label">Fecha del evento</label>
+                    <input asp-for="Fecha" class="form-control" />
+                    <span asp-validation-for="Fecha" class="text-danger"></span>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Generar Tickets</label>
-                <input class="form-control" name="totalTickets" type="number" />
+                <h2 class="card-title mb-3 border-bottom">Información de tickets</h2>
+
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Tickets Premium</label>
+                                <input class="form-control" name="totalPremium" type="number" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Precio Premium</label>
+                                <input class="form-control" name="precioPremium" type="number" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Tickets VIP</label>
+                                <input class="form-control" name="totalVip" type="number" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Precio VIP</label>
+                                <input class="form-control" name="precioVip" type="number" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Tickets Generales</label>
+                                <input class="form-control" name="totalGeneral" type="number" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Precio General</label>
+                                <input class="form-control" name="precioGeneral" type="number" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
-            <div class="form-group">
-                <select name="Categoria" class="form-control" asp-items="ViewBag.IdCategoria"></select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Precio de la ticket</label>
-                <input class="form-control" name="precio" type="number" />
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="card-footer">
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
             </div>
         </form>
     </div>

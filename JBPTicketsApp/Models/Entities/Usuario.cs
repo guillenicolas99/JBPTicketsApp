@@ -11,6 +11,11 @@ namespace JBPTicketsApp.Models.Entities
         [Required(ErrorMessage = "El correo es requerido")]
         public string Correo { get; set; }
         [Required(ErrorMessage = "La contraseña es obligatoria"), MinLength(8, ErrorMessage = "La contraseña debe contener al menos 8 caracteres")]
-        public string Clave{ get; set; }
+        public string Clave { get; set; }
+
+        // Relación con Rol
+        public int IdRol { get; set; }
+        public Rol Rol { get; set; }
     }
+
 }
