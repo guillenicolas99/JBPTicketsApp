@@ -20,3 +20,43 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+table thead th{
+    text-align: center;
+}
+
+.pagos-sec{
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 45%;
+    height: 100vh;
+    transition: .3s ease;
+}
+
+.hide-side {
+    transform: translateX(100%);
+}
+
+.show-side {
+    transform: translateX(0);
+}
+
+.ticket-state{
+    padding: 5px;
+    border-radius: 8px;
+    color: #fff;
+}
+
+.pagado {
+    background-color: #5CB338;
+}
+
+.pendiente {
+    background-color: #C62300;
+}
+
+.abonado{
+    color: #333;
+    background-color: #FFC145;
+}

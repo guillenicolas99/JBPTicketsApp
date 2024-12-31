@@ -5,6 +5,8 @@
     int i = 1;
 }
 
+@Html.DisplayNameFor(model => model.IdEvento)
+
 <section class="my-3">
     <div class="row">
         <div class="col-md-6">
@@ -22,15 +24,17 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-hover table-striped shadow border myTable table-responsive" id="availableTickets">
+        <table class="table table-hover table-striped shadow border myTable table-responsive text-start" id="availableTickets">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Código</th>
                     <th>Precio</th>
+                    <th>Abono</th>
                     <th>Estado</th>
                     <th>Categoría</th>
                     <th>Responsable</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,11 +42,25 @@
                 {
                     <tr data-ticket-id="@ticket.IdTicket" class="available-ticket">
                         <td>@i</td>
-                        <td>@ticket.Codigo</td>
+                        <td>
+                            <a asp-route-id="@ticket.IdTicket" asp-controller="Tickets">
+                                @ticket.Codigo
+                            </a>
+                        </td>
                         <td>$@ticket.Precio</td>
-                        <td>@ticket.Estado</td>
+                        <td>$@ticket.Abono</td>
+                        <td>
+                            <span class="@ticket.Estado.ToLower() ticket-state">
+                                @ticket.Estado
+                            </span>
+                        </td>
                         <td>@ticket.Categoria?.Nombre</td>
                         <td class="ticket-asignado">@ticket.Persona?.Nombre</td>
+                        <td>
+                            <button class="btn btn-outline-success show-abonar" data-codigo="@ticket.Codigo" data-responsable="@ticket.Persona?.Nombre">
+                                Abonar / Pagar
+                            </button>
+                        </td>
                     </tr>
                     i++;
                 }
@@ -55,3 +73,112 @@
     <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.IdEvento">Editar este evento</a> |
     <a class="btn btn-outline-secondary" asp-action="Index">Volver a la lista de eventos</a>
 </div>
+
+<aside class="pagos-sec card hide-side" id="abonar-side">
+    <div class="card-header">
+        <h2 class="card-title">Abonar</h2>
+    </div>
+    <form class="card-body card-abonar" id="form-abonar">
+        <div class="mb-3">
+            <label class="form-label">Monto a abonar / Pagar</label>
+            <input type="number" class="form-control" id="monto-abono" />
+        </div>
+        <div class="mb-3">
+            <p>
+                <strong>Responsable: </strong>
+                <span id="responsable"></span>
+            </p>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Código de la Ticket:</label>
+            <input class="form-control" type="text" id="codigo-ticket" readonly />
+        </div>
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Guardar</button>
+            <button class="btn btn-outline-danger hide-aside" type="button">Cancelar</button>
+        </div>
+    </form>
+</aside>
+
+<script>
+    if (document.querySelectorAll('.show-abonar') || document.querySelectorAll('.show-pagar')) {
+        const abonarBtn = document.querySelectorAll('.show-abonar');
+        const hideAsideBtn = document.querySelectorAll('.hide-aside');
+        const abonarAside = document.querySelector('#abonar-side');
+
+        // Campos del formulario
+        const inputResponsable = document.querySelector('#responsable');
+        const inputCodigoTicket = document.querySelector('#codigo-ticket');
+        const inputMontoAbono = document.querySelector('#monto-abono');
+        const formAbonar = document.querySelector('#form-abonar');
+
+
+        const toggleAside = (show) => {
+            if (show) {
+                abonarAside.classList.remove('hide-side');
+                abonarAside.classList.add('show-side');
+            } else {
+                abonarAside.classList.remove('show-side');
+                abonarAside.classList.add('hide-side');
+            }
+        };
+
+        abonarBtn.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const responsable = btn.dataset.responsable;
+                const codigoTicket = btn.dataset.codigo;
+
+                inputResponsable.textContent = responsable;
+                inputCodigoTicket.value = codigoTicket;
+                toggleAside(true);
+            });
+        });
+
+        hideAsideBtn.forEach(btn => {
+            btn.addEventListener('click', () => {
+                toggleAside(false);
+            });
+        });
+
+        // Manejar el envío del formulario
+        formAbonar.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const codigoTicket = inputCodigoTicket.value;
+            const montoAbono = inputMontoAbono.value;
+
+            if (!codigoTicket || !montoAbono) {
+                alert("Por favor, complete todos los campos.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/tickets/abonar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        codigoTicket: codigoTicket,
+                        montoAbono: parseFloat(montoAbono),
+                    }),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`Abono exitoso: ${result.message}`);
+                    abonarAside.classList.remove('show-side');
+                    abonarAside.classList.add('hide-side');
+                    location.reload()
+                } else {
+                    const error = await response.json();
+                    alert(`Error al abonar: ${error.message}`);
+                }
+            } catch (err) {
+                console.error("Error al procesar el abono:", err);
+                alert("Ocurrió un error al procesar el abono.");
+            }
+        });
+
+    }
+</script>

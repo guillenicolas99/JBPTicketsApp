@@ -2,5 +2,58 @@
 
 @{
     ViewData["Title"] = "Index";
+    int i = 1;
 }
 
+<div class="table-responsive">
+    <table class="table table-hover table-striped shadow border myTable table-responsive text-start" id="availableTickets">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Código</th>
+                <th>Precio</th>
+                <th>Abono</th>
+                <th>Estado</th>
+                <th>Categoría</th>
+                <th>Evento</th>
+                <th>Responsable</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in Model)
+            {
+                <tr data-ticket-id="@ticket.IdTicket" class="available-ticket">
+                    <td>@i</td>
+                    <td>
+                        <a asp-route-id="@ticket.IdTicket" asp-controller="Tickets">
+                            @ticket.Codigo
+                        </a>
+                    </td>
+                    <td>$@ticket.Precio</td>
+                    <td>$@ticket.Abono</td>
+                    <td>
+                        <span class="@ticket.Estado.ToLower() ticket-state">
+                            @ticket.Estado
+                        </span>
+                    </td>
+                    <td>@ticket.Categoria?.Nombre</td>
+                    <td>@ticket.Evento?.Nombre</td>
+                    <td class="ticket-asignado">@ticket.Persona?.Nombre</td>
+                    <td>
+                        <a class="btn btn-outline-warning show-abonar" asp-action="Edit" asp-route-id="@ticket.IdTicket">
+                            Editar
+                        </a>
+                        <a class="btn btn-outline-secondary show-abonar" asp-action="Details" asp-route-id="@ticket.IdTicket">
+                            Detalles
+                        </a>
+                        <a class="btn btn-outline-danger show-pagar" asp-action="Delete" asp-route-id="@ticket.IdTicket">
+                            Eliminar
+                        </a>
+                    </td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    </table>
+</div>

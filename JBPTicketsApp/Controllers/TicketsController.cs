@@ -175,5 +175,78 @@ namespace JBPTicketsApp.Controllers
         {
             return _context.Tickets.Any(e => e.IdTicket == id);
         }
+
+        //MÉTODO PARA ABONAR A UNA TICKET
+        [HttpPost]
+        public IActionResult Abonar([FromBody] AbonarRequest request)
+        {
+            if (string.IsNullOrEmpty(request.CodigoTicket) || request.MontoAbono <= 0)
+            {
+                return BadRequest(new { message = "Datos inválidos" });
+            }
+
+            // Lógica para registrar el abono en la base de datos
+            var ticket = _context.Tickets
+                .Include(t => t.Categoria)
+                .Include(t => t.Evento)
+                .Include(t => t.Persona)
+                .FirstOrDefault(t => t.Codigo == request.CodigoTicket);
+            if (ticket == null)
+            {
+                return NotFound(new { message = "Ticket no encontrado" });
+            }
+
+            if (ticket.Estado == "Pagado")
+            {
+                return BadRequest(new { message = "El ticket ya está pagado." });
+            }
+
+            if (ticket.Persona?.Nombre == "Sin asignar")
+            {
+                return BadRequest(new { message = "El ticket debe estar asignado." });
+            }
+
+            ticket.Abono += request.MontoAbono;
+            ticket.Estado = "Abonado";
+
+            if (ticket.Abono > ticket.Precio)
+            {
+                return BadRequest(new { message = "El abono supera el saldo pendiente." });
+            }
+
+            if (ticket.Abono == ticket.Precio)
+            {
+                ticket.Estado = "Pagado";
+            }
+
+            _context.SaveChanges();
+
+            return Ok(new { message = "Abono registrado correctamente." });
+        }
+
+        public class AbonarRequest
+        {
+            public string CodigoTicket { get; set; }
+            public double MontoAbono { get; set; }
+        }
+
+
+        //MÉTODO PARA CANCELAR/PAGAR UNA TICKET
+        [HttpPost]
+        public IActionResult CancelarTicket(int ticketId)
+        {
+            var ticket = _context.Tickets.Find(ticketId);
+            if (ticket == null || ticket.Estado == "Pagado")
+            {
+                return NotFound("La ticket no puede ser cancelada.");
+            }
+
+            ticket.Estado = "Cancelado";
+            _context.SaveChanges();
+
+            return RedirectToAction("ReporteTicketsPendientes", new { eventoId = ticket.IdEvento });
+        }
+
+
     }
 }

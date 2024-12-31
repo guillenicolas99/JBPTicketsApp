@@ -95,7 +95,7 @@ namespace JBPTicketsApp.Controllers
             {
                 var nuevoTicket = new Ticket
                 {
-                    Codigo = $"{evento.Nombre.Substring(0, 3).ToUpper()}_{eventYear}-{numeroInicial + i:D3}",
+                    Codigo = $"{evento.Nombre.Substring(0, 3).ToUpper()}_{eventYear}_{numeroInicial + i:D3}",
                     Abono = 0,
                     Precio = precio,
                     Descuento = 0,
