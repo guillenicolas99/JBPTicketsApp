@@ -5,12 +5,13 @@
     int i = 1;
 }
 
-@Html.DisplayNameFor(model => model.IdEvento)
-
 <section class="my-3">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <ul class="list-group">
+                <li class="list-group-item">
+                    <h2>Detalles del evento</h2>
+                </li>
                 <li class="list-group-item">
                     <strong>@Html.DisplayNameFor(model => model.Nombre):</strong>
                     @Html.DisplayFor(model => model.Nombre)
@@ -20,6 +21,60 @@
                     @Html.DisplayFor(model => model.Fecha)
                 </li>
             </ul>
+        </div>
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Generar reportes</h2>
+                </div>
+                <div class="card-body">
+                    <form id="by-status" asp-action="StatusReportPdf" method="get">
+                        <input type="hidden" id="id-evento-pdf" name="evento" value="@Model.IdEvento" />
+                        <div class="row align-items-end">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Estado</label>
+                                    <select class="form-select mb-3" id="status-pdf" name="estado">
+                                        <option selected value="">Todas</option>
+                                        <option value="pendiente">Pendiente</option>
+                                        <option value="abonado">Abonado</option>
+                                        <option value="pagado">Pagado</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Categoría</label>
+                                    <select class="form-select mb-3" id="categoria-pdf" name="categoria">
+                                        <option selected value=""> Todas</option>
+                                        @foreach (var categoria in ViewBag.Categorias)
+                                        {
+                                            <option value="@categoria.IdCategoria">@categoria.Nombre</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Red</label>
+                                    <select class="form-select mb-3" id="red-pdf" name="red">
+                                        <option selected value="">Todas</option>
+                                        @foreach (var red in ViewBag.Redes)
+                                        {
+                                            <option value="@red.IdRed">@red.Nombre</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <button type="submit" class="btn btn-primary">Generar reporte</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -34,6 +89,7 @@
                     <th>Estado</th>
                     <th>Categoría</th>
                     <th>Responsable</th>
+                    <th>Red</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -56,6 +112,7 @@
                         </td>
                         <td>@ticket.Categoria?.Nombre</td>
                         <td class="ticket-asignado">@ticket.Persona?.Nombre</td>
+                        <td class="ticket-asignado">@ticket.Persona?.Red.Nombre</td>
                         <td>
                             <button class="btn btn-outline-success show-abonar" data-codigo="@ticket.Codigo" data-responsable="@ticket.Persona?.Nombre">
                                 Abonar / Pagar
@@ -100,85 +157,4 @@
     </form>
 </aside>
 
-<script>
-    if (document.querySelectorAll('.show-abonar') || document.querySelectorAll('.show-pagar')) {
-        const abonarBtn = document.querySelectorAll('.show-abonar');
-        const hideAsideBtn = document.querySelectorAll('.hide-aside');
-        const abonarAside = document.querySelector('#abonar-side');
-
-        // Campos del formulario
-        const inputResponsable = document.querySelector('#responsable');
-        const inputCodigoTicket = document.querySelector('#codigo-ticket');
-        const inputMontoAbono = document.querySelector('#monto-abono');
-        const formAbonar = document.querySelector('#form-abonar');
-
-
-        const toggleAside = (show) => {
-            if (show) {
-                abonarAside.classList.remove('hide-side');
-                abonarAside.classList.add('show-side');
-            } else {
-                abonarAside.classList.remove('show-side');
-                abonarAside.classList.add('hide-side');
-            }
-        };
-
-        abonarBtn.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const responsable = btn.dataset.responsable;
-                const codigoTicket = btn.dataset.codigo;
-
-                inputResponsable.textContent = responsable;
-                inputCodigoTicket.value = codigoTicket;
-                toggleAside(true);
-            });
-        });
-
-        hideAsideBtn.forEach(btn => {
-            btn.addEventListener('click', () => {
-                toggleAside(false);
-            });
-        });
-
-        // Manejar el envío del formulario
-        formAbonar.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const codigoTicket = inputCodigoTicket.value;
-            const montoAbono = inputMontoAbono.value;
-
-            if (!codigoTicket || !montoAbono) {
-                alert("Por favor, complete todos los campos.");
-                return;
-            }
-
-            try {
-                const response = await fetch('/tickets/abonar', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        codigoTicket: codigoTicket,
-                        montoAbono: parseFloat(montoAbono),
-                    }),
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    alert(`Abono exitoso: ${result.message}`);
-                    abonarAside.classList.remove('show-side');
-                    abonarAside.classList.add('hide-side');
-                    location.reload()
-                } else {
-                    const error = await response.json();
-                    alert(`Error al abonar: ${error.message}`);
-                }
-            } catch (err) {
-                console.error("Error al procesar el abono:", err);
-                alert("Ocurrió un error al procesar el abono.");
-            }
-        });
-
-    }
-</script>
+<script src="~/js/Eventos.js"></script>

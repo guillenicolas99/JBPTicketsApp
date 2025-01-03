@@ -1,0 +1,180 @@
+﻿@model dynamic
+@{
+    Layout = null;
+    int i = 1;
+}
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        text-align: center;
+    }
+
+    td {
+        text-align: center;
+    }
+
+    tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    ul {
+        list-style-type: disc; /* Tipo de viñeta: círculo sólido */
+        margin: 10px 0; /* Espaciado vertical */
+        padding-left: 20px; /* Sangría para las viñetas */
+    }
+
+    ul li {
+        margin-bottom: 5px; /* Espaciado entre los elementos de la lista */
+    }
+
+    ul li:hover {
+        color: #007BFF; /* Cambia el color del texto al pasar el cursor */
+        cursor: pointer; /* Cambia el cursor al pasar por encima */
+    }
+
+    .state{
+        padding: 5px;
+        border-radius: 5px;
+        font-weight: 800;
+    }
+
+    .Pagado{
+        background-color: #5CB338;
+        color: #fff;
+    }
+
+    .Abonado {
+        background-color: #FFC145;
+    }
+
+    .Pendiente {
+        background-color: #C62300;
+        color: #fff;
+    }
+</style>
+
+<h2 class="text-center">Informe de tickets del evento: <span class="text-uppercase">@Model.Evento</span></h2>
+@if (!string.IsNullOrEmpty(Model.Red))
+{   
+    <h2 class="text-center">Informe de la red: @Model.Red </h2>
+}
+
+@if (!string.IsNullOrEmpty(Model.Categoria))
+{
+    <h2 class="text-center">Informe de las tickets: @Model.Categoria </h2>
+}
+
+@if (!string.IsNullOrEmpty(Model.Estado))
+{
+    <h2 class="text-center">Informe de las tickets: @Model.Estado </h2>
+}
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Código</th>
+            <th>Estado</th>
+            <th>Categoría</th>
+            <th>Persona</th>
+            <th>Red</th>
+            <th>Monto Total</th>
+            <th>Monto Abonado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ticket in Model.Tickets)
+        {
+            <tr>
+                <td>@i</td>
+                <td>@ticket.Codigo</td>
+                <td>
+                    <span class="@ticket.Estado state">
+                        @ticket.Estado
+                    </span>
+                </td>
+                <td>@ticket.Categoria.Nombre</td>
+                <td>@ticket?.Persona?.Nombre</td>
+                <td>@ticket?.Persona?.Red?.Nombre</td>
+                <td>@ticket?.Precio</td>
+                <td>@ticket?.Abono</td>
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>
+
+<h2 style="text-align: center">Resumen</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Red</th>
+            <th>Tickets asignadas</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var red in @Model.ticketsPorRed)
+        {
+            <tr>
+                <td>@red.Red</td>
+                <td>@red.Count</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tipo de ticket</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var categoria in @Model.ticketsPorCategoria)
+        {
+            <tr>
+                <td>@categoria.Categoria</td>
+                <td>@categoria.Count</td>
+            </tr>
+        }
+        <tr>
+            <td>Total</td>
+            <td>@Model.totalTickets</td>
+        </tr>
+    </tbody>
+</table>
+
+<table>
+    <thead>
+        <tr>
+            <th>Estado</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var estado in Model.ticketsPorEstado)
+        {
+            <tr>
+                <td>
+                    @estado.Estado
+                </td>
+                <td>
+                    @estado.Count
+                </td>
+            </tr>
+        } 
+    </tbody>
+</table>

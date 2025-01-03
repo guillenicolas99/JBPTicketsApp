@@ -9,6 +9,7 @@ using JBPTicketsApp.Models;
 using JBPTicketsApp.Models.Entities;
 using JBPTicketsApp.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Rotativa.AspNetCore;
 
 namespace JBPTicketsApp.Controllers
 {
@@ -22,13 +23,11 @@ namespace JBPTicketsApp.Controllers
             _context = context;
         }
 
-        // GET: Eventos
         public async Task<IActionResult> Index()
         {
             return View(await _context.Eventos.ToListAsync());
         }
 
-        // GET: Eventos/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,9 +38,13 @@ namespace JBPTicketsApp.Controllers
             var evento = _context.Eventos
                 .Include(e => e.Tickets) // Incluye las tickets relacionadas
                     .ThenInclude(t => t.Persona) // Cargar la persona asociada a cada ticket
+                    .ThenInclude(p => p.Red)
                 .Include(e => e.Tickets)
                     .ThenInclude(t => t.Categoria)
                 .FirstOrDefault(e => e.IdEvento == id);
+
+            ViewBag.Categorias = _context.Categorias.ToList();
+            ViewBag.Redes = _context.Redes.ToList();
 
             if (evento == null)
             {
@@ -51,16 +54,12 @@ namespace JBPTicketsApp.Controllers
             return View(evento);
         }
 
-        // GET: Eventos/Create
         public IActionResult Create()
         {
             ViewData["IdCategoria"] = new SelectList(_context.Categorias, "IdCategoria", "Nombre");
             return View();
         }
 
-        // POST: Eventos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdEvento,Nombre,Fecha")] Evento evento, int totalPremium, int precioPremium, int totalVip, int precioVip, int totalGeneral, int precioGeneral)
@@ -167,7 +166,6 @@ namespace JBPTicketsApp.Controllers
             return RedirectToAction("Index");
         }
 
-        // GET: Eventos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -183,9 +181,6 @@ namespace JBPTicketsApp.Controllers
             return View(evento);
         }
 
-        // POST: Eventos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdEvento,Nombre,Fecha")] Evento evento)
@@ -218,7 +213,6 @@ namespace JBPTicketsApp.Controllers
             return View(evento);
         }
 
-        // GET: Eventos/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -236,7 +230,6 @@ namespace JBPTicketsApp.Controllers
             return View(evento);
         }
 
-        // POST: Eventos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -249,6 +242,96 @@ namespace JBPTicketsApp.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult StatusReportPdf(int? evento, string estado, int? categoria, int? red)
+        {
+            // Verificar que el evento está seleccionado
+            if (!evento.HasValue)
+            {
+                ModelState.AddModelError("", "Debe seleccionar un evento.");
+                ViewBag.Eventos = _context.Eventos.ToList();
+                ViewBag.Redes = _context.Redes.ToList();
+                return View("Index");
+            }
+
+            // Construir la consulta base
+            var query = _context.Tickets
+                .Include(t => t.Persona) // Incluir relación con Persona
+                .ThenInclude(p => p.Red) // Incluir relación con Red
+                .Include(t => t.Categoria)
+                .Where(t => t.IdEvento == evento.Value) // Filtrar por evento
+                .AsQueryable();
+
+            var eventoActual = _context.Eventos.FirstOrDefault(e => e.IdEvento == evento.Value);
+            var redActual = _context.Redes.FirstOrDefault(r => r.IdRed == red);
+            var categoriaActual = _context.Categorias.FirstOrDefault(c => c.IdCategoria == categoria);
+
+            // Aplicar filtros
+            if (!string.IsNullOrEmpty(estado))
+            {
+                query = query.Where(t => t.Estado == estado);
+            }
+
+            if (categoria.HasValue)
+            {
+                query = query.Where(t => t.Categoria.IdCategoria == categoria.Value);
+            }
+
+            if (red.HasValue)
+            {
+                query = query.Where(t => t.Persona.Red.IdRed == red.Value);
+            }
+
+            // Calcular estadísticas
+            var totalTickets = query.Count();
+            var ticketsPorEstado = query.GroupBy(t => t.Estado)
+                .Select(g => new
+                {
+                    Estado = g.Key,
+                    Count = g.Count(),
+                })
+                .ToList();
+            var ticketsPorRed = query.GroupBy(t => t.Persona.Red.Nombre)
+                                      .Select(group => new { Red = group.Key, Count = group.Count() })
+                                      .ToList();
+            var ticketsPorCategoria = query.GroupBy(t => t.Categoria.Nombre)
+                .Select(group => new { Categoria = group.Key, Count = group.Count() })
+                .ToList();
+
+
+
+            // Ejecutar la consulta y pasar los resultados a la vista
+            var ticketsFiltrados = query.ToList();
+
+            var reportData = new
+            {
+                Tickets = ticketsFiltrados,
+                Evento = eventoActual?.Nombre,
+                Red = redActual?.Nombre,
+                Categoria = categoriaActual?.Nombre,
+                Estado = estado,
+                //Estadísticas
+                totalTickets,
+                ticketsPorRed,
+                ticketsPorCategoria,
+                ticketsPorEstado
+            };
+
+            string pathEvento = string.IsNullOrEmpty(reportData.Evento) ? $"" : $"{reportData.Evento}";
+            string pathRed = string.IsNullOrEmpty(reportData.Red) ? "" : $"_{reportData.Red}";
+            string pathCategoria = string.IsNullOrEmpty(reportData.Categoria) ? "" : $"_{reportData.Categoria}_";
+            string pathEstado = string.IsNullOrEmpty(reportData.Estado) ? "" : $"_{reportData.Estado}";
+
+            string pathFileName = $"{pathEvento}{pathRed}{pathCategoria}{pathEstado}.pdf";
+
+            return new ViewAsPdf("StatusReportPdf", reportData)
+            {
+                PageSize = Rotativa.AspNetCore.Options.Size.Legal,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait,
+                FileName = pathFileName,
+            };
         }
 
         private bool EventoExists(int id)
