@@ -10,6 +10,7 @@ using JBPTicketsApp.Models.Entities;
 using JBPTicketsApp.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Rotativa.AspNetCore;
+using JBPTicketsApp.Servicios.Contrato;
 
 namespace JBPTicketsApp.Controllers
 {
@@ -27,6 +28,14 @@ namespace JBPTicketsApp.Controllers
         {
             return View(await _context.Eventos.ToListAsync());
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEventos()
+        {
+            var eventos = await _context.Eventos.ToListAsync();
+            return Json(eventos);
+        }
+
 
         public async Task<IActionResult> Details(int? id)
         {
@@ -62,8 +71,14 @@ namespace JBPTicketsApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdEvento,Nombre,Fecha")] Evento evento, int totalPremium, int precioPremium, int totalVip, int precioVip, int totalGeneral, int precioGeneral)
+        public async Task<IActionResult> Create([Bind("IdEvento,Nombre,Fecha")] Evento evento, int? totalPremium, int? precioPremium, int? totalVip, int? precioVip, int? totalGeneral, int? precioGeneral)
         {
+            evento.Nombre = $"{evento.Nombre}_{evento.Fecha.Year}";
+            if(_context.Eventos.Any(e => e.Nombre == evento.Nombre))
+            {
+                ViewData["IdCategoria"] = new SelectList(_context.Categorias, "IdCategoria", "Nombre");
+                return View(evento);
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(evento);
@@ -80,7 +95,7 @@ namespace JBPTicketsApp.Controllers
             return View(evento);
         }
 
-        public void CrearTickets(int idEvento, int totalTickets, int categoria, double precio)
+        public void CrearTickets(int idEvento, int? totalTickets, int? categoria, double? precio)
         {
             var evento = _context.Eventos.Find(idEvento);
             // Suponiendo que tienes un input con fecha y hora
@@ -96,11 +111,11 @@ namespace JBPTicketsApp.Controllers
                 {
                     Codigo = $"{evento.Nombre.Substring(0, 3).ToUpper()}_{eventYear}_{numeroInicial + i:D3}",
                     Abono = 0,
-                    Precio = precio,
+                    Precio = (double)precio,
                     Descuento = 0,
                     Estado = "Pendiente",
                     IdEvento = evento.IdEvento,
-                    IdCategoria = categoria,
+                    IdCategoria = (int)categoria,
                     IdPersona = 1
                 };
 

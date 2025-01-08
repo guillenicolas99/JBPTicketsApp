@@ -9,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("connectionDb");
 
+builder.Services.AddScoped(typeof(IRepositoryAsync<>), typeof(RepositoryAsync<>));
+//builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString)
 );
