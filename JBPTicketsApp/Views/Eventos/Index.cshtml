@@ -9,13 +9,15 @@
 </a>
 
 <!-- Loader (se muestra mientras se cargan los datos) -->
-<div id="loader" style="display:none;">
-    <p>Cargando...</p>
+<div id="loader" class="card">
+    <div class="card-body">
+        <p class="card-text">Cargando eventos...</p>
+    </div>
 </div>
 <table id="eventosTable" class="table table-secondary table-striped shadow table-hover d-none">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>#</th>
             <th>Nombre</th>
             <th>Fecha</th>
             <th>Acciones</th>
@@ -26,6 +28,7 @@
     </tbody>
 </table>
 
+<!-- 
 <table class="table table-secondary table-striped shadow table-hover myTable">
     <thead>
         <tr>
@@ -67,5 +70,6 @@
         }
     </tbody>
 </table>
+ -->
 
 <script src="~/js/Evento/Index.js"></script>

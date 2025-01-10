@@ -63,6 +63,30 @@ namespace JBPTicketsApp.Controllers
             return View(evento);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetDetails(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest(new { message = "Datos inválidos" });
+            }
+
+            var evento = _context.Eventos
+                .Include(e => e.Tickets) // Incluye las tickets relacionadas
+                    .ThenInclude(t => t.Persona) // Cargar la persona asociada a cada ticket
+                    .ThenInclude(p => p.Red)
+                .Include(e => e.Tickets)
+                    .ThenInclude(t => t.Categoria)
+                .FirstOrDefault(e => e.IdEvento == id);
+
+            if (evento == null)
+            {
+                return BadRequest(new { message = "No se encontró evento" });
+            }
+
+            return Json(evento);
+        }
+
         public IActionResult Create()
         {
             ViewData["IdCategoria"] = new SelectList(_context.Categorias, "IdCategoria", "Nombre");
